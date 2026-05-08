@@ -13,41 +13,56 @@ namespace KillMeForMyPower.Restrictions
         // This will be executed in the player that hits last when the boss dies
         public static void Postfix(Character __instance)
         {
-            if (__instance != null && __instance.IsBoss())
-            {
-                string bossName = __instance.name.Replace("(Clone)", "");
-                Player mLocalPlayer = Player.m_localPlayer;
-                
-                List<string> playersToGrant = new List<string>();
-                playersToGrant.Add(mLocalPlayer.GetPlayerName());
-                
-                //Detect players around
-                if (ConfigurationFile.grantKillToNearbyPlayers.Value)
-                {
-                    Logger.LogInfo("Finding nearby players to grant the kill");
-                    Character boss = __instance;
-                    BaseAI ai = boss.GetComponent<BaseAI>();
-                    float aggroRange = ai ? ai.m_viewRange : 0f;
-                    Logger.LogInfo($"Detection boss range for {boss.name.Replace("(Clone)", "")} is {aggroRange} meters");
+            if (__instance == null || !__instance.IsBoss())
+                return;
 
-                    Vector3 bossPosition = __instance.transform.position;
-                    List<Player> nearbyPlayers = Player.GetAllPlayers();
-                    foreach (Player player in nearbyPlayers)
-                    {
-                        if (player == null) continue;
-                        if (player.GetPlayerName() == mLocalPlayer.GetPlayerName()) continue;
-                        
-                        if (Vector3.Distance(player.transform.position, bossPosition) <= aggroRange)
-                            playersToGrant.Add(player.GetPlayerName());
-                    }
+            string bossName = __instance.name.Replace("(Clone)", "");
+
+            List<string> playersToGrant = new List<string>();
+
+            // En dedicado no existe Player.m_localPlayer.
+            // Detectamos jugadores desde la posición del boss.
+            Character boss = __instance;
+            BaseAI ai = boss.GetComponent<BaseAI>();
+            float aggroRange = ConfigurationFile.bossRewardDetectionRange.Value;
+
+            Logger.LogInfo($"Detection boss range for {boss.name.Replace("(Clone)", "")} is {aggroRange} meters");
+
+            Vector3 bossPosition = boss.transform.position;
+
+            List<Player> nearbyPlayers = Player.GetAllPlayers();
+
+            foreach (Player player in nearbyPlayers)
+            {
+                if (player == null)
+                    continue;
+
+                if (Vector3.Distance(player.transform.position, bossPosition) <= aggroRange)
+                {
+                    string playerName = player.GetPlayerName();
+
+                    if (!string.IsNullOrEmpty(playerName) && !playersToGrant.Contains(playerName))
+                        playersToGrant.Add(playerName);
                 }
-                
-                //Send RPC to host with all fighters names
-                ZRoutedRpc.instance.InvokeRoutedRPC(0L, "RPC_BossPowerGrantServer", bossName, string.Join(",", playersToGrant));
             }
+
+            if (playersToGrant.Count == 0)
+            {
+                Logger.LogWarning($"No nearby players found for boss kill grant: {bossName}");
+                return;
+            }
+
+            Logger.LogInfo($"Granting {bossName} kill to: {string.Join(", ", playersToGrant)}");
+
+            ZRoutedRpc.instance.InvokeRoutedRPC(
+                0L,
+                "RPC_BossPowerGrantServer",
+                bossName,
+                string.Join(",", playersToGrant)
+            );
         }
     }
-    
+
     [HarmonyPatch(typeof(Player), "Save")]
     public class Player_Save_Null_Key_Clean_Patch
     {

@@ -47,7 +47,7 @@ namespace KillMeForMyPower.Restrictions
                 }
                 //Trophies
                 if (name.ToLowerInvariant().Contains("trophy"))
-                    amount = ConfigurationFile.dropsBossItems.Value == BossDropRule.OnePlayer
+                    amount = ConfigurationFile.dropsBossTrophies.Value == BossDropRule.OnePlayer
                         ? 1
                         : countPlayersNearby;
                 
@@ -61,12 +61,14 @@ namespace KillMeForMyPower.Restrictions
         private static int GetCountPlayersNearby(Character boss)
         {
             BaseAI ai = boss.GetComponent<BaseAI>();
-            float aggroRange = ai ? ai.m_viewRange : 0f;
+            float aggroRange = ConfigurationFile.bossRewardDetectionRange.Value;
             Logger.Log($"Detection boss range for {boss.name.Replace("(Clone)", "")} is {aggroRange} meters");
-            
+
+            Vector3 bossPosition = boss.transform.position;
+
             List<Player> playersNearby = new List<Player>();
-            Vector3 playerPosition = Player.m_localPlayer.transform.position;
-            Player.GetPlayersInRange(playerPosition, aggroRange, playersNearby);
+            Player.GetPlayersInRange(bossPosition, aggroRange, playersNearby);
+
             return playersNearby.Count;
         }
     }

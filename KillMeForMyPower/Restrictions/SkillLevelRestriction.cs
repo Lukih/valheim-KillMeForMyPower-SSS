@@ -65,7 +65,7 @@ namespace KillMeForMyPower.Restrictions
                 {
                     //Reset buff for DetailedLevels mod
                     Logger.Log("Checking DetailedLevels buff...");
-                    List<StatusEffect> statusEffects = (List<StatusEffect>)GameManager.GetPrivateValue(Player.m_localPlayer.GetSEMan(), "m_statusEffects");
+                    List<StatusEffect> statusEffects = (List<StatusEffect>)GameManager.GetPrivateValue(player.GetSEMan(), "m_statusEffects");
                     StatusEffect buffEffect = statusEffects.Find(effect => effect.m_name.Contains(buffName));
                     if (buffEffect != null)
                     {
@@ -151,7 +151,11 @@ namespace KillMeForMyPower.Restrictions
         {
             Logger.Log("Checking blood magic here since it doesn't seem to go through Player.RaiseSkill...");
             await Task.Delay((int)(Math.Max(0f, seconds) * 1000)); // to milliseconds
-            LevelCalculation.reviewAndUpdateSkill(player == null ? Player.m_localPlayer : player, Skills.SkillType.BloodMagic, "$skill_bloodmagic");
+
+            Player targetPlayer = player ?? Player.m_localPlayer;
+            if (targetPlayer == null) return;
+
+            LevelCalculation.reviewAndUpdateSkill(targetPlayer, Skills.SkillType.BloodMagic, "$skill_bloodmagic");
         }
     }
     

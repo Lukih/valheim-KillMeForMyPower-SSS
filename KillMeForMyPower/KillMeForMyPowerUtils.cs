@@ -29,7 +29,7 @@ namespace KillMeForMyPower
         {
             return bossName.GetTranslationKey();
         }
-        
+
         public static bool HasDefeatedBossNameStr(string bossName)
         {
             BossNameEnum parsedEnum;
@@ -39,28 +39,61 @@ namespace KillMeForMyPower
             }
             catch (Exception e)
             {
-                Logger.LogError("Error in HasDefeatedBossName with "+bossName+" in parseBossName. "+e);
+                Logger.LogError("Error in HasDefeatedBossName with " + bossName + " in parseBossName.\n" + e);
                 return false;
             }
+
             return HasDefeatedBossName(parsedEnum);
         }
-        
-        public static bool HasDefeatedBossName(BossNameEnum bossNameEnum)
+
+        public static bool HasDefeatedBossNameStr(string bossName, Player player)
         {
-            bool hasDefeated = BossNameUtils.IsBossPowerGrantedForPlayer(bossNameEnum, Player.m_localPlayer);
-            Logger.Log($"hasDefeated(1) for player {Player.m_localPlayer.GetPlayerName()}: {hasDefeated}");
+            BossNameEnum parsedEnum;
+            try
+            {
+                parsedEnum = parseBossName(bossName);
+            }
+            catch (Exception e)
+            {
+                Logger.LogError("Error in HasDefeatedBossName with " + bossName + " in parseBossName.\n" + e);
+                return false;
+            }
+
+            return HasDefeatedBossName(parsedEnum, player);
+        }
+
+        public static bool HasDefeatedBossName(BossNameEnum bossNameEnum, Player player)
+        {
+            if (player == null)
+                return false;
+
+            bool hasDefeated = BossNameUtils.IsBossPowerGrantedForPlayer(bossNameEnum, player);
+            Logger.Log($"hasDefeated(1) for player {player.GetPlayerName()}: {hasDefeated}");
+
             if (!hasDefeated)
             {
-                hasDefeated = ConfigurationFile.activateMidPlayDetection.Value && Player.m_localPlayer.HaveUniqueKey(bossNameEnum.GetPowerKey());
-                Logger.Log($"hasDefeated(2) for player {Player.m_localPlayer.GetPlayerName()}: {hasDefeated}");
+                hasDefeated = ConfigurationFile.activateMidPlayDetection.Value &&
+                              player.HaveUniqueKey(bossNameEnum.GetPowerKey());
+
+                Logger.Log($"hasDefeated(2) for player {player.GetPlayerName()}: {hasDefeated}");
+
                 if (hasDefeated)
                 {
-                    Logger.Log("Learned the power before. Granting!");
-                    //Take the chance to add the player name
-                    ZRoutedRpc.instance.InvokeRoutedRPC(0L, "RPC_BossPowerGrantServer", bossNameEnum.ToString(), Player.m_localPlayer.GetPlayerName());
+                    ZRoutedRpc.instance.InvokeRoutedRPC(
+                        0L,
+                        "RPC_BossPowerGrantServer",
+                        bossNameEnum.ToString(),
+                        player.GetPlayerName()
+                    );
                 }
             }
+
             return hasDefeated;
+        }
+
+        public static bool HasDefeatedBossName(BossNameEnum bossNameEnum)
+        {
+            return HasDefeatedBossName(bossNameEnum, Player.m_localPlayer);
         }
 
         public static int GetCurrentDay()

@@ -23,6 +23,7 @@ namespace KillMeForMyPower
     
     internal class ConfigurationFile
     {
+        internal static void Save() { configFile.Save(); }
         private static ConfigEntry<bool> _serverConfigLocked;
         public static ConfigEntry<bool> debug;
         public static ConfigEntry<bool> activateMidPlayDetection;
@@ -54,6 +55,7 @@ namespace KillMeForMyPower
 
         public static ConfigEntry<BossDropRule> dropsBossItems;
         public static ConfigEntry<BossDropRule> dropsBossTrophies;
+        public static ConfigEntry<float> bossRewardDetectionRange;
 
         public static ConfigEntry<bool> minLevelToSpawnBoss;
         public static ConfigEntry<string> minLevelToSpawnBossNotMet; 
@@ -138,7 +140,8 @@ namespace KillMeForMyPower
                 
                 dropsBossItems    = config("2.4 - Boss drops rules", "Item drops", BossDropRule.Default, "If not default, drops a number of boss items according to the selected rule");
                 dropsBossTrophies = config("2.4 - Boss drops rules", "Trophy drops", BossDropRule.Default, "If not default, drops a number of trophies according to the selected rule");
-                
+                bossRewardDetectionRange = config("2.4 - Boss drops rules", "Boss Reward Detection Range", 80f, "Range around the boss to detect players eligible for boss rewards (default = 80)");
+
                 minLevelToSpawnBoss       = config("2.5 - EpicMMO integration", "Minimum level required", true, "If true and epicMMO is enabled, the player needs to have the same level as the boss as minimum to spawn it (default = true)");
                 minLevelToSpawnBossNotMet = config("2.5 - EpicMMO integration", "Not minimum level message", "You need at least level {0} to start this battle", "Message to indicate the player doesn't have the minimum necessary level to spawn the boss");
 

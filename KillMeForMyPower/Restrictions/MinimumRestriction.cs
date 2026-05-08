@@ -17,13 +17,12 @@ namespace KillMeForMyPower.Restrictions
             Logger.Log("Detecting players around "+ConfigurationFile.minimumPlayersAroundRange.Value + " meters...");
 
             List<Player> playersNearby = new List<Player>();
-            Vector3 playerPosition = Player.m_localPlayer.transform.position;
-            Player.GetPlayersInRange(playerPosition, ConfigurationFile.minimumPlayersAroundRange.Value, playersNearby);
+            Player.GetPlayersInRange(point, ConfigurationFile.minimumPlayersAroundRange.Value, playersNearby);
 
             if (playersNearby.Count < ConfigurationFile.minimumPlayersAroundAmount.Value)
             {
                 Logger.Log($"{playersNearby} players detected. Minimum required: {ConfigurationFile.minimumPlayersAroundAmount.Value}. Cancelling...");
-                Player.m_localPlayer.Message(MessageHud.MessageType.Center, ConfigurationFile.minimumPlayersAroundForbiddenMessage.Value.Replace("{0}", ConfigurationFile.minimumPlayersAroundAmount.Value.ToString()));
+                if (Player.m_localPlayer != null) Player.m_localPlayer.Message(MessageHud.MessageType.Center, ConfigurationFile.minimumPlayersAroundForbiddenMessage.Value.Replace("{0}", ConfigurationFile.minimumPlayersAroundAmount.Value.ToString()));
                 return false;
             }
             Logger.Log("No monsters detected.");
@@ -40,7 +39,7 @@ namespace KillMeForMyPower.Restrictions
                         int minLevel = GetMonsterLevel(monsterData);
                         if (EpicMMOSystem_API.GetLevel() < minLevel)
                         {
-                            Player.m_localPlayer.Message(MessageHud.MessageType.Center, ConfigurationFile.minLevelToSpawnBossNotMet.Value.Replace("{0}", minLevel.ToString()));
+                            if (Player.m_localPlayer != null) Player.m_localPlayer.Message(MessageHud.MessageType.Center, ConfigurationFile.minLevelToSpawnBossNotMet.Value.Replace("{0}", minLevel.ToString()));
                             return false;
                         }
 

@@ -12,6 +12,8 @@ namespace KillMeForMyPower.Restrictions
     {
         public static void scareEffect()
         {
+            if (Player.m_localPlayer == null) return;
+
             global::KillMeForMyPower.Effects effect = ConfigurationFile.scareEffect.Value;
             if (effect != global::KillMeForMyPower.Effects.None)
             {
@@ -34,21 +36,21 @@ namespace KillMeForMyPower.Restrictions
             
             if (__instance is Player)
             {
-                if (item.m_shared.m_name == "$item_pickaxe_antler" && !KillMeForMyPowerUtils.HasDefeatedBossName(BossNameEnum.Eikthyr))
+                if (item.m_shared.m_name == "$item_pickaxe_antler" && !KillMeForMyPowerUtils.HasDefeatedBossName(BossNameEnum.Eikthyr, __instance as Player))
                 {
                     __instance.Message(MessageHud.MessageType.Center, ConfigurationFile.restrictUsingKeyItemsMessage.Value.Replace("{0}", BossNameEnum.Eikthyr.GetTranslationKey()));
                     Effects.scareEffect();
                     __result = false;
                     return false;
                 }
-                if (item.m_shared.m_name == "$item_wishbone" && !KillMeForMyPowerUtils.HasDefeatedBossName(BossNameEnum.Bonemass))
+                if (item.m_shared.m_name == "$item_wishbone" && !KillMeForMyPowerUtils.HasDefeatedBossName(BossNameEnum.Bonemass, __instance as Player))
                 {
                     __instance.Message(MessageHud.MessageType.Center, ConfigurationFile.restrictUsingKeyItemsMessage.Value.Replace("{0}", BossNameEnum.Bonemass.GetTranslationKey()));
                     Effects.scareEffect();
                     __result = false;
                     return false;
                 }
-                if (item.m_shared.m_name == "$item_demister" && !KillMeForMyPowerUtils.HasDefeatedBossName(BossNameEnum.Yagluth))
+                if (item.m_shared.m_name == "$item_demister" && !KillMeForMyPowerUtils.HasDefeatedBossName(BossNameEnum.Yagluth, __instance as Player))
                 {
                     __instance.Message(MessageHud.MessageType.Center, ConfigurationFile.restrictUsingKeyItemsMessage.Value.Replace("{0}", BossNameEnum.Yagluth.GetTranslationKey()));
                     Effects.scareEffect();
@@ -69,7 +71,7 @@ namespace KillMeForMyPower.Restrictions
         {
             if (!ConfigurationFile.restrictUsingKeyItems.Value) return true;
             
-            if (__instance.name.Contains("sunken_crypt_gate") && character is Player && !KillMeForMyPowerUtils.HasDefeatedBossName(BossNameEnum.TheElder))
+            if (__instance.name.Contains("sunken_crypt_gate") && character is Player && !KillMeForMyPowerUtils.HasDefeatedBossName(BossNameEnum.TheElder, character as Player))
             {
                 character.Message(MessageHud.MessageType.Center, ConfigurationFile.restrictUsingKeyItemsMessage.Value.Replace("{0}", BossNameEnum.TheElder.GetTranslationKey()));
                 Effects.scareEffect();

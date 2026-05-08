@@ -9,8 +9,8 @@ namespace KillMeForMyPower
     public class KillMeForMyPower : BaseUnityPlugin
     {
         public const string GUID = "Turbero.KillMeForMyPower";
-        public const string NAME = "Kill Me For My Power";
-        public const string VERSION = "2.3.1";
+        public const string NAME = "Kill Me For My Power (Lukih SSS)";
+        public const string VERSION = "2.3.1-SSS-1.0";
 
         private readonly Harmony harmony = new Harmony(GUID);
 

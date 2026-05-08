@@ -18,7 +18,7 @@ namespace KillMeForMyPower.Restrictions
                 string selectedPower = power.Replace("GP_", "");
                 Logger.Log("ActivateGuardianPower - guardianPowerName: " + selectedPower);
                 
-                if (!KillMeForMyPowerUtils.HasDefeatedBossNameStr(selectedPower) && 
+                if (!KillMeForMyPowerUtils.HasDefeatedBossNameStr(selectedPower, __instance) && 
                     KillMeForMyPowerUtils.GetCurrentDay() < KillMeForMyPowerUtils.GetBossMinimumDayForPower(selectedPower))
                 {
                     __instance.Message(MessageHud.MessageType.Center, ConfigurationFile.forbiddenMessage.Value);
@@ -37,7 +37,11 @@ namespace KillMeForMyPower.Restrictions
         {
             public static bool Prefix(ItemStand __instance)
             {
+                Player player = Player.m_localPlayer;
+                if (player == null) return true;
+
                 string itemStandName = __instance.m_guardianPower?.name.Replace("GP_", "");
+                
                 Logger.Log("DelayedPowerActivation - ItemStand name: "+ itemStandName);
                 if (!KillMeForMyPowerUtils.HasDefeatedBossNameStr(itemStandName) &&
                     KillMeForMyPowerUtils.GetCurrentDay() < KillMeForMyPowerUtils.GetBossMinimumDayForPower(itemStandName))
@@ -53,6 +57,9 @@ namespace KillMeForMyPower.Restrictions
 
         private static void ApplyBlockedEffect(string bossName)
         {
+            Player player = Player.m_localPlayer;
+            if (player == null) return;
+
             SEMan seMan = Player.m_localPlayer.GetSEMan();
             string buffNames = string.Join(";", seMan.GetStatusEffects().Select(se => se.name));
             BossNameEnum parsedBossName = (BossNameEnum)Enum.Parse(typeof(BossNameEnum), bossName, true);

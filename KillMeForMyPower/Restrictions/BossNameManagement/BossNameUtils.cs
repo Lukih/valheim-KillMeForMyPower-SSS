@@ -85,6 +85,8 @@ namespace KillMeForMyPower.Restrictions.BossNameManagement
                     Logger.LogWarning("Not saved, boss not found!");
                     break;
             }
+
+            ConfigurationFile.Save();
         }
     }
 }
